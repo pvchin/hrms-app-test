@@ -16,6 +16,7 @@ const SigninForm = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [alert, setAlert] = useState(true);
+  const [error, setError] = useState(false);
   //const [isLoading, setIsLoading] = useState(false);
   console.log("user", user);
   const [loginLevel, setLoginLevel] = useRecoilState(loginLevelState);
@@ -48,30 +49,37 @@ const SigninForm = () => {
           reporting_to: row.reporting_to,
         };
       });
-    console.log("emp", emp);
-    if (emp[0].email === email && emp[0].password === password) {
-      setLoginLevel({
-        ...loginLevel,
-        loginUser: emp[0].name,
-        loginUserId: emp[0].id,
-        loginLevel: role,
-        loginEmail: email,
-        login: true,
-        leave_bal: emp[0].leave_bal,
-        siteallows_fee: emp[0].siteallows_fee,
-        perdiem_fee: emp[0].perdiem_fee,
-        reporting_to: emp[0].reporting_to,
-      });
-      setEditEmployeeID(emp[0].id);
-      setPassword("");
-      setStoredUser(emp[0]);
-
-      console.log("save user", loginLevel);
-    } else {
-      setAlert(false);
+    console.log("emp", emp, emp.length);
+    if (!emp.length) {
+      setError(true);
       setTimeout(() => {
-        setAlert(true);
+        setError(false);
       }, 2000);
+    } else {
+      if (emp[0].email === email && emp[0].password === password) {
+        setLoginLevel({
+          ...loginLevel,
+          loginUser: emp[0].name,
+          loginUserId: emp[0].id,
+          loginLevel: role,
+          loginEmail: email,
+          login: true,
+          leave_bal: emp[0].leave_bal,
+          siteallows_fee: emp[0].siteallows_fee,
+          perdiem_fee: emp[0].perdiem_fee,
+          reporting_to: emp[0].reporting_to,
+        });
+        setEditEmployeeID(emp[0].id);
+        setPassword("");
+        setStoredUser(emp[0]);
+
+        console.log("save user", loginLevel);
+      } else {
+        setAlert(false);
+        setTimeout(() => {
+          setAlert(true);
+        }, 2000);
+      }
     }
   };
 
@@ -96,6 +104,14 @@ const SigninForm = () => {
     setRole("Manager");
     handleSubmit(e);
   };
+
+  if (!employees) {
+    return (
+      <div>
+        <h2>Loading....</h2>
+      </div>
+    );
+  }
 
   return (
     <form className={classes.root} onSubmit={handleSubmit}>
@@ -161,6 +177,7 @@ const SigninForm = () => {
         {/* </ButtonGroup> */}
       </div>
       {!alert && <h3>Login Fail!</h3>}
+      {error && <h3>Email not found!</h3>}
     </form>
   );
 };

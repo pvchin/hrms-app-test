@@ -7,7 +7,8 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import CheckIcon from "@material-ui/icons/Check";
 import SearchIcon from "@material-ui/icons/Search";
-
+import { useRecoilState } from "recoil";
+import { editEmployeeIdState } from "./data/atomdata";
 import { CustomDialog } from "../helpers/CustomDialog";
 import { AlertDialog } from "../helpers/AlertDialog";
 import EmployeeView from "./EmployeeView";
@@ -34,7 +35,8 @@ export default function AllEmployeesTable() {
   const classes = useStyles();
   const { designations } = useDesignations();
   const { departments } = useDepartments();
-  const { employees } = useEmployees();
+  const { employees, setEmployeeId } = useEmployees();
+  const [empId, setEmpId] = useRecoilState(editEmployeeIdState);
   const deleteEmployees = useDeleteEmployees();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -49,7 +51,7 @@ export default function AllEmployeesTable() {
     setIsEditingOff,
     resetSingleEmployee,
     resetEmployees,
-    getSingleEmployee,
+        getSingleEmployee,
   } = useEmployeesContext();
 
   const { loadDepartments, loadDesignations, resetTables } = useTablesContext();
@@ -61,12 +63,14 @@ export default function AllEmployeesTable() {
 
   const update_Employee = async (data) => {
     const { id } = data;
-    resetTables();
+    //resetTables();
     resetSingleEmployee();
     resetEmployees();
     setEditEmployeeID(id);
     setIsEditingOn();
-    getSingleEmployee(id);
+    setEmployeeId(id);
+    
+    //getSingleEmployee(id);
     //handleDialogOpen();
     history.push("/singleemployee");
   };

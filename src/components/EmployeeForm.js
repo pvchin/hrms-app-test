@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Icon,
@@ -7,6 +7,8 @@ import {
   Typography,
   Grid,
   Divider,
+  FormControlLabel,
+  Checkbox,
 } from "@material-ui/core";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -15,7 +17,9 @@ import { useEmployeesContext } from "../context/employees_context";
 import { Controller, useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import { loginLevelState } from "./data/atomdata";
+import { editEmployeeIdState } from "./data/atomdata";
 
+import { useEmployees } from "./employees/useEmployees";
 import { useAddEmployees } from "./employees/useAddEmployees";
 import { useUpdateEmployees } from "./employees/useUpdateEmployees";
 import { useDepartments } from "./departments/useDepartments";
@@ -31,10 +35,12 @@ const initial_values = {
   ic_no: "",
   email: "",
   age: 0,
-  address:"",
+  nationality: "",
+  address: "",
   basic_salary: 0,
   bank_name: "",
   bank_acno: "",
+  tap_checkbox: true,
   tap_acno: "",
   scp_acno: "",
   date_of_join: null,
@@ -47,29 +53,37 @@ const initial_values = {
   workpermit_expirydate: null,
   siteallows_fee: 0,
   perdiem_fee: 0,
-  empno:"",
+  empno: "",
 };
 
 const EmployeeForm = () => {
   const classes = useStyles();
-  const {
-    isEditing,
-    single_employee,
-    updateEmployee,
-    addEmployee,
-    editEmployeeID,
-    single_employee_loading,
-  } = useEmployeesContext();
+  const { employees, employeeId, setEmployeeId } = useEmployees();
+   const addEmployees = useAddEmployees();
+  const updateEmployees = useUpdateEmployees();
+  const { designations } = useDesignations();
+  const { departments } = useDepartments();
+  const [empId, setEmpId] = useRecoilState(editEmployeeIdState);
+  const { handleSubmit, control } = useForm();
+  const [loginLevel, setLoginLevel] = useRecoilState(loginLevelState);
+  const { isEditing, editEmployeeID } = useEmployeesContext();
+  const single_employee = employees
+    .filter((r) => r.id === editEmployeeID)
+    .map((r) => {
+      return { ...r };
+    });
   const {
     name,
     ic_no,
     gender,
     age,
     email,
+    nationality,
     address,
     basic_salary,
     bank_name,
     bank_acno,
+    tap_checkbox,
     tap_acno,
     scp_acno,
     date_of_join,
@@ -83,36 +97,20 @@ const EmployeeForm = () => {
     siteallows_fee,
     perdiem_fee,
     empno,
-  } = single_employee || initial_values;
-  const addEmployees = useAddEmployees();
-  const updateEmployees = useUpdateEmployees();
-  const { designations } = useDesignations();
-  const { departments } = useDepartments();
-   const [alert, setAlert] = useState(false);
-  const { handleSubmit, control } = useForm();
-  const [loginLevel, setLoginLevel] = useRecoilState(loginLevelState);
-
+  } = single_employee[0];
+  console.log("form",single_employee)
   const onSubmit = (data) => {
     if (isEditing) {
       updateEmployees({ id: editEmployeeID, ...data });
     } else {
       addEmployees({ ...data });
     }
-    // setAlert(true);
-    // setTimeout(() => {
-    //   setAlert(false);
-    // }, 3000);
-    //loadEmployees();
-    // <Alert severity="success">
-    //   <AlertTitle>Success</AlertTitle>
-    //   This is a success alert — <strong>check it out!</strong>
-    // </Alert>;
-    //history.push("/allemployees");
   };
 
-  if (single_employee_loading) {
-    return <div>Loading...</div>;
+  if (!employees) {
+    return <h2>Loading ...</h2>;
   }
+
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -148,7 +146,7 @@ const EmployeeForm = () => {
                     return (
                       <TextField
                         label="Name"
-                        id="margin-normal"
+                        id="standard-name"
                         name="name"
                         defaultValue={name}
                         className={classes.textField}
@@ -171,9 +169,9 @@ const EmployeeForm = () => {
                     return (
                       <TextField
                         label="Emp No"
-                        id="margin-normal"
-                        name="empno"
+                        id="standard-empno"
                         defaultValue={empno}
+                        name="empno"
                         className={classes.textField}
                         onChange={onChange}
                         error={!!error}
@@ -196,7 +194,7 @@ const EmployeeForm = () => {
                     return (
                       <TextField
                         label="Email"
-                        id="margin-normal"
+                        id="standard-email"
                         name="email"
                         defaultValue={email}
                         className={classes.textField}
@@ -220,9 +218,9 @@ const EmployeeForm = () => {
                     return (
                       <TextField
                         label="IC No"
-                        id="margin-normal"
-                        name="ic_no"
+                        id="standard-icno"
                         defaultValue={ic_no}
+                        name="ic_no"
                         className={classes.textField}
                         onChange={onChange}
                         error={!!error}
@@ -245,7 +243,7 @@ const EmployeeForm = () => {
                     return (
                       <TextField
                         label="Gender"
-                        id="margin-normal"
+                        id="standard-gender"
                         name="gender"
                         defaultValue={gender}
                         className={classes.textField}
@@ -274,7 +272,7 @@ const EmployeeForm = () => {
                       <TextField
                         label="Age"
                         type="number"
-                        id="standard-number"
+                        id="standard-age"
                         name="age"
                         defaultValue={age}
                         className={classes.textField}
@@ -302,7 +300,7 @@ const EmployeeForm = () => {
                     return (
                       <TextField
                         label="Passport No"
-                        id="margin-normal"
+                        id="standard-passportno"
                         name="passportno"
                         defaultValue={passportno}
                         className={classes.textField}
@@ -325,7 +323,7 @@ const EmployeeForm = () => {
                     return (
                       <TextField
                         label="Passport Expiry Date"
-                        id="margin-normal"
+                        id="standard-ppexpiry"
                         name="passport_expirydate"
                         type="date"
                         defaultValue={passport_expirydate}
@@ -340,6 +338,31 @@ const EmployeeForm = () => {
                     );
                   }}
                   //rules={{ required: "Name required" }}
+                />
+              </div>
+              <div>
+                <Controller
+                  name="nationality"
+                  control={control}
+                  defaultValue={nationality}
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => {
+                    return (
+                      <TextField
+                        label="Nationnality"
+                        id="standard-nationality"
+                        name="nationality"
+                        defaultValue={nationality}
+                        className={classes.textField}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    );
+                  }}
+                  //rules={{ required: "IC No required" }}
                 />
               </div>
               <div>
@@ -463,51 +486,26 @@ const EmployeeForm = () => {
               </div>
               <div>
                 <Controller
-                  name="bank_name"
+                  name="tap_checkbox"
                   control={control}
-                  defaultValue={bank_name}
                   render={({
                     field: { onChange, value },
                     fieldState: { error },
                   }) => {
                     return (
-                      <TextField
-                        label="Bank Name"
-                        id="margin-normal"
-                        name="bank_name"
-                        defaultValue={bank_name}
-                        className={classes.textField}
-                        onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={tap_checkbox}
+                            onChange={onChange}
+                            name="tap_checkbox"
+                          />
+                        }
+                        label="TAP/SCP Contribution"
                       />
                     );
                   }}
-                  //rules={{ required: "Email is required" }}
-                />
-
-                <Controller
-                  name="bank_acno"
-                  control={control}
-                  defaultValue={bank_acno}
-                  render={({
-                    field: { onChange, value },
-                    fieldState: { error },
-                  }) => {
-                    return (
-                      <TextField
-                        label="Bank Ac No"
-                        id="margin-normal"
-                        name="bank_acno"
-                        defaultValue={bank_acno}
-                        className={classes.textField}
-                        onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
-                      />
-                    );
-                  }}
-                  // rules={{ required: "Email is required" }}
+                  //rules={{ required: "IC No required" }}
                 />
               </div>
               <div>
@@ -557,6 +555,55 @@ const EmployeeForm = () => {
                     );
                   }}
                   //rules={{ required: "Email is required" }}
+                />
+              </div>
+              <div>
+                <Controller
+                  name="bank_name"
+                  control={control}
+                  defaultValue={bank_name}
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => {
+                    return (
+                      <TextField
+                        label="Bank Name"
+                        id="margin-normal"
+                        name="bank_name"
+                        defaultValue={bank_name}
+                        className={classes.textField}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    );
+                  }}
+                  //rules={{ required: "Email is required" }}
+                />
+
+                <Controller
+                  name="bank_acno"
+                  control={control}
+                  defaultValue={bank_acno}
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => {
+                    return (
+                      <TextField
+                        label="Bank Ac No"
+                        id="margin-normal"
+                        name="bank_acno"
+                        defaultValue={bank_acno}
+                        className={classes.textField}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    );
+                  }}
+                  // rules={{ required: "Email is required" }}
                 />
               </div>
               <div>

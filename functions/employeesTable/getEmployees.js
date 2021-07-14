@@ -2,7 +2,7 @@ const { table } = require("./airtable-employees");
 const formattedReturn = require("../formattedReturn");
 
 module.exports = async (event) => {
-  const { id, fv } = event.queryStringParameters;
+  const { id, fv, fi } = event.queryStringParameters;
   // const { id, filterValue, filterField } = event.queryStringParameters;
   // console.log(filterValue, filterField);
 
@@ -18,7 +18,7 @@ module.exports = async (event) => {
 
     return formattedReturn(200, formattedEmployees);
   }
-  
+
   try {
     if (fv) {
       const employees = await table
@@ -43,20 +43,24 @@ module.exports = async (event) => {
     return formattedReturn(404, {});
   }
 
-  // if (fv) {
-  //   const employees = await table
-  //     .select({
-  //       view: "viewEmployeeName",
-  //       filterByFormula: `email = '${fv}'`,
-  //     })
-  //     .firstPage();
-  //   const formattedEmployees = employees.map((employee) => ({
-  //     id: employee.id,
-  //     name: employee.name,
-  //   }));
+  try {
+    if (fi) {
+      // const { id, linkid, ...fields } = JSON.parse(event.body);
+      // console.log(linkid);
+      const employees = await table
+        .select({ filterByFormula: `id = '${fi}'` })
+        .firstPage();
+      const formattedEmployees = employees.map((e) => ({
+        id: e.id,
+        ...e.fields,
+      }));
 
-  //   return formattedReturn(200, formattedEmployees);
-  // }
+      return formattedReturn(200, formattedEmployees);
+    }
+  } catch (err) {
+    console.error(err);
+    return formattedReturn(500, {});
+  }
 
   try {
     const employees = await table.select().all();

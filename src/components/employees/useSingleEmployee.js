@@ -6,7 +6,7 @@ import axios from "axios";
 import { queryKeys } from "../react-query/constants";
 
 async function getSingleEmployee(empid) {
-  const { data } = await axios.get(`${employees_url}?fv=${empid}`);
+   const { data } = await axios.get(`${employees_url}?id=${empid}`);
   return data;
 }
 
@@ -14,9 +14,9 @@ export function useSingleEmployee() {
   const [singleEmployeeId, setSingleEmployeeId] = useState("");
   const fallback = [];
   const { data: singleemployee = fallback } = useQuery(
-    queryKeys.singleemployee,
-    ()=>getSingleEmployee(singleEmployeeId)
+    [queryKeys.singleemployee, { singleEmployeeId }],
+    () => getSingleEmployee(singleEmployeeId),
+   
   );
-
   return { singleemployee, setSingleEmployeeId };
 }

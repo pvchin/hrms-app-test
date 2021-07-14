@@ -15,6 +15,11 @@ export const loginLevelState = atom({
   },
 });
 
+export const editEmployeeIdState = atom({
+  key: "editEmployeeIdState",
+  default: "",
+});
+
 export const payPeriodState = atom({
   key: "payPeriodState",
   default: "",

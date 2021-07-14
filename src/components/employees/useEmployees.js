@@ -7,7 +7,7 @@ import axios from "axios";
 import { queryKeys } from "../react-query/constants";
 
 async function getEmployees(empid) {
-  //const { data } = await axios.get(`${employees_url}?fv=${empid}`);
+  //const { data } = await axios.get(`${employees_url}?id=${empid}`);
   const { data } = await axios.get(`${employees_url}`);
   return data;
 }
@@ -23,8 +23,7 @@ export function useEmployees(empid) {
 
   const fallback = [];
   const { data: employees = fallback } = useQuery(
-    //[queryKeys.leaves, { leaveId }],
-    queryKeys.employees,
+    [queryKeys.employees],
     () => getEmployees(employeeId),
     {
       select: filter !== "all" ? selectFn : undefined,

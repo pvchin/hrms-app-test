@@ -31,7 +31,7 @@ module.exports = async (event) => {
 
       return formattedReturn(200, formattedFamily);
     }
-  } catch (error) {
+  } catch (err) {
     console.error(err);
     return formattedReturn(500, {});
   }

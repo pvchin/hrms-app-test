@@ -7,6 +7,8 @@ import {
   Typography,
   Grid,
   Divider,
+  Checkbox,
+  FormControlLabel,
 } from "@material-ui/core";
 
 import { Alert } from "@material-ui/lab";
@@ -32,10 +34,12 @@ const initial_values = {
   ic_no: "",
   email: "",
   age: 0,
-  address:"",
+  address: "",
+  nationality: "",
   basic_salary: 0,
   bank_name: "",
   bank_acno: "",
+  tap_checkbox: true,
   tap_acno: "",
   scp_acno: "",
   date_of_join: null,
@@ -70,9 +74,11 @@ const EmployeeFormNew = () => {
     age,
     email,
     address,
+    nationality,
     basic_salary,
     bank_name,
     bank_acno,
+    tap_checkbox,
     tap_acno,
     scp_acno,
     date_of_join,
@@ -323,6 +329,31 @@ const EmployeeFormNew = () => {
               </div>
               <div>
                 <Controller
+                  name="nationality"
+                  control={control}
+                  defaultValue={nationality}
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => {
+                    return (
+                      <TextField
+                        label="Nationality"
+                        id="standard-nationality"
+                        name="nationality"
+                        defaultValue={nationality}
+                        className={classes.textField}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    );
+                  }}
+                  //rules={{ required: "IC No required" }}
+                />
+              </div>
+              <div>
+                <Controller
                   name="address"
                   control={control}
                   defaultValue={address}
@@ -440,53 +471,30 @@ const EmployeeFormNew = () => {
                   />
                 )}
               </div>
+
               <div>
                 <Controller
-                  name="bank_name"
+                  name="tap_checkbox"
                   control={control}
-                  defaultValue={bank_name}
+                  defaultValue={tap_checkbox}
                   render={({
                     field: { onChange, value },
                     fieldState: { error },
                   }) => {
                     return (
-                      <TextField
-                        label="Bank Name"
-                        id="margin-normal"
-                        name="bank_name"
-                        defaultValue={bank_name}
-                        className={classes.textField}
-                        onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={tap_checkbox}
+                            onChange={onChange}
+                            name="tap_checkbox"
+                          />
+                        }
+                        label="TAP/SCP Contribution"
                       />
                     );
                   }}
-                  //rules={{ required: "Email is required" }}
-                />
-
-                <Controller
-                  name="bank_acno"
-                  control={control}
-                  defaultValue={bank_acno}
-                  render={({
-                    field: { onChange, value },
-                    fieldState: { error },
-                  }) => {
-                    return (
-                      <TextField
-                        label="Bank Ac No"
-                        id="margin-normal"
-                        name="bank_acno"
-                        defaultValue={bank_acno}
-                        className={classes.textField}
-                        onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
-                      />
-                    );
-                  }}
-                  // rules={{ required: "Email is required" }}
+                  //rules={{ required: "IC No required" }}
                 />
               </div>
               <div>
@@ -536,6 +544,55 @@ const EmployeeFormNew = () => {
                     );
                   }}
                   //rules={{ required: "Email is required" }}
+                />
+              </div>
+              <div>
+                <Controller
+                  name="bank_name"
+                  control={control}
+                  defaultValue={bank_name}
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => {
+                    return (
+                      <TextField
+                        label="Bank Name"
+                        id="margin-normal"
+                        name="bank_name"
+                        defaultValue={bank_name}
+                        className={classes.textField}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    );
+                  }}
+                  //rules={{ required: "Email is required" }}
+                />
+
+                <Controller
+                  name="bank_acno"
+                  control={control}
+                  defaultValue={bank_acno}
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => {
+                    return (
+                      <TextField
+                        label="Bank Ac No"
+                        id="margin-normal"
+                        name="bank_acno"
+                        defaultValue={bank_acno}
+                        className={classes.textField}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    );
+                  }}
+                  // rules={{ required: "Email is required" }}
                 />
               </div>
               <div>
